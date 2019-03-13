@@ -1,0 +1,108 @@
+---
+title: "Week 1 exercises"
+author: "Suvi Vainio"
+date: "13 maaliskuuta 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#setwd("//ad.helsinki.fi/home/s/suvivain/Documents/2019 Survival analysis")
+library(survival)
+?veteran # for explanation of the variables in the data set
+data(veteran) # load the data
+str(veteran) # show records of the dat
+head(veteran)
+```
+
+# Task 1
+
+Plot a histogram of the survival times corresponding to uncensored observations (veteran$status == 1) by changing values of nclass and also without nclass.
+
+Histogram is right skewed: large number of the population dies at the beginning of the calendar time under study.
+
+```{r cars}
+hist(veteran$time[veteran$status == 1], nclass=30, main='', xlab='Survival time (days)',
+     col='gray90')
+hist(veteran$time[veteran$status == 1], main='', xlab='Survival time (days)',
+     col='gray90')
+# Right skewed data
+```
+
+# Task 2 
+
+Create an output file where the histogram is stored. Remember to first defint outpath where the file should be stored.
+
+```{R}
+pdf(file.path(getwd(), 'survtimes.pdf'))
+op <- par(mar=c(4,4,0,0), mgp=c(2,1,0))
+hist(veteran$time[veteran$status == 1], nclass=30, main='', xlab='Survival time (days)',
+     col='gray90')
+par(op)
+dev.off()
+```
+
+
+# Task 3
+## a) 
+
+Use the survifit routine in R to calculate the Kaplan-Meier estimate of the overall survival in the data. In the survival routines of R, the response variable needs to be specified as a survival object. If the observed failure time variable is time and failure indicator variable is status, the response variable is created as Surv(time, status).
+Applying the plot command to the output object from the survfit routine, you can draw the estimate and its confidence limits. Experiment with different confidence levels (e.g. 80% and 95%). You can also practice with the plot command options (e.g. xlab, ylab).
+
+```{R}
+#head(veteran)
+analyse1=survfit(Surv(time, status)~1, data=veteran) #, conf.type="none")
+summary(analyse1)
+plot(analyse1, col="red", xlab="Calendar time", ylab = "Proportion died")
+# Change confidence interval  
+analyse1=survfit(Surv(time, status)~1, data=veteran, conf.int=0.8)
+lines(analyse1, col="blue")
+legend("topright", c("Red: 95 % CI", "Blue: 80 %"), lty=1, col=c("Red", "Blue"))
+
+```
+
+## b. 
+Plot the Kaplan-Meier estimates of the survival functions separately for the two treatment groups (standard vs. test). Does there appear to be a difference between the two groups in survival?
+
+Survival curve is steeper for the test group at the beginning of the calendar time. After approximately 100 days the slope is not as steep and the survival function is above standard group.
+
+```{R}
+analyse2=survfit(Surv(time, status)~trt, data=veteran, conf.int=0.95)#, conf.type="none")
+analyse2
+plot(analyse2, col=c("blue", "red"), xlab="calendar time", ylab="proportion alive")
+legend("topright", legend = c("standard", "test"), col=c("blue", "red"), lty=1)
+```
+
+Irrespective of the treatment group, compare the survival in groups defined by the histological type of tumor (variable celltype). You may also like to explore the effect on survival of the other covariates in the data.
+
+Celltypes form two clusters. Smallcell and adeno have a steep survival function, large and squamous types less so. In terms of survival squamous cell type is advantageous.
+
+```{R}
+analyse3=survfit(Surv(time, status)~celltype, data=veteran, conf.int=0.8)
+plot(analyse3, col=c("red", "blue", "green", "purple"))
+legend("topright", legend=levels(veteran$celltype), col=c("red", "blue", "green", "purple"), lty=1)
+print(analyse3)
+
+```
+
+## c. 
+
+Compare the two treatments by the log-rank test. You can find this in the survdiff routine.
+Compare then the effect of celltype on survival.
+
+Survival function for the test group is higher than the standard group at times and lower at times. There is also no obvious difference that one treatment would clearly outperform the other.
+
+Hypotheses for the log-rank-test are as follows:
+H0: There's no difference between the survival functions of the two treatment groups.
+H1: There's a difference between the groups.
+
+survdiff output reveals that the probability for the to curves to be same or similar is 0.9, so it is very likely that null hypothesis should be more true.
+
+```{R}
+analyse3=survdiff(Surv(time, status)~trt, data=veteran)
+print(analyse3)
+
+```
+
+
+
