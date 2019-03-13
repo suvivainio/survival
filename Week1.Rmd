@@ -17,7 +17,7 @@ head(veteran)
 
 # Task 1
 
-Plot a histogram of the survival times corresponding to uncensored observations (veteran$status == 1) by changing values of nclass and also without nclass.
+*Plot a histogram of the survival times corresponding to uncensored observations (veteran$status == 1) by changing values of nclass and also without nclass.*
 
 Histogram is right skewed: large number of the population dies at the beginning of the calendar time under study.
 
@@ -31,7 +31,9 @@ hist(veteran$time[veteran$status == 1], main='', xlab='Survival time (days)',
 
 # Task 2 
 
-Create an output file where the histogram is stored. Remember to first defint outpath where the file should be stored.
+*Create an output file where the histogram is stored. Remember to first defint outpath where the file should be stored.*
+
+(File created)
 
 ```{R}
 pdf(file.path(getwd(), 'survtimes.pdf'))
@@ -46,8 +48,9 @@ dev.off()
 # Task 3
 ## a) 
 
-Use the survifit routine in R to calculate the Kaplan-Meier estimate of the overall survival in the data. In the survival routines of R, the response variable needs to be specified as a survival object. If the observed failure time variable is time and failure indicator variable is status, the response variable is created as Surv(time, status).
-Applying the plot command to the output object from the survfit routine, you can draw the estimate and its confidence limits. Experiment with different confidence levels (e.g. 80% and 95%). You can also practice with the plot command options (e.g. xlab, ylab).
+*Use the survifit routine in R to calculate the Kaplan-Meier estimate of the overall survival in the data. In the survival routines of R, the response variable needs to be specified as a survival object. If the observed failure time variable is time and failure indicator variable is status, the response variable is created as Surv(time, status).*
+
+*Applying the plot command to the output object from the survfit routine, you can draw the estimate and its confidence limits. Experiment with different confidence levels (e.g. 80% and 95%). You can also practice with the plot command options (e.g. xlab, ylab).*
 
 ```{R}
 #head(veteran)
@@ -62,7 +65,7 @@ legend("topright", c("Red: 95 % CI", "Blue: 80 %"), lty=1, col=c("Red", "Blue"))
 ```
 
 ## b. 
-Plot the Kaplan-Meier estimates of the survival functions separately for the two treatment groups (standard vs. test). Does there appear to be a difference between the two groups in survival?
+*Plot the Kaplan-Meier estimates of the survival functions separately for the two treatment groups (standard vs. test). Does there appear to be a difference between the two groups in survival?*
 
 Survival curve is steeper for the test group at the beginning of the calendar time. After approximately 100 days the slope is not as steep and the survival function is above standard group.
 
@@ -73,7 +76,7 @@ plot(analyse2, col=c("blue", "red"), xlab="calendar time", ylab="proportion aliv
 legend("topright", legend = c("standard", "test"), col=c("blue", "red"), lty=1)
 ```
 
-Irrespective of the treatment group, compare the survival in groups defined by the histological type of tumor (variable celltype). You may also like to explore the effect on survival of the other covariates in the data.
+*Irrespective of the treatment group, compare the survival in groups defined by the histological type of tumor (variable celltype). You may also like to explore the effect on survival of the other covariates in the data.*
 
 Celltypes form two clusters. Smallcell and adeno have a steep survival function, large and squamous types less so. In terms of survival squamous cell type is advantageous.
 
@@ -87,8 +90,7 @@ print(analyse3)
 
 ## c. 
 
-Compare the two treatments by the log-rank test. You can find this in the survdiff routine.
-Compare then the effect of celltype on survival.
+*Compare the two treatments by the log-rank test. You can find this in the survdiff routine. Compare then the effect of celltype on survival.*
 
 Survival function for the test group is higher than the standard group at times and lower at times. There is also no obvious difference that one treatment would clearly outperform the other.
 
@@ -104,5 +106,35 @@ print(analyse3)
 
 ```
 
+For celltypes it seems that the survival functions of the different cell types are different (p<0.001), and null hypothesis doesn't get support. 
 
 
+```{R}
+analyse3=survdiff(Surv(time, status)~celltype, data=veteran)
+print(analyse3)
+
+```
+
+Also if data is further stratified by variable prior therapy, groups are likeli to differ (p<0.001).
+
+No prior therapy is associated with larger survival function values than the values of those having had prior therapy. The only exception is the squamous celltype, where the survival function is larger especially at the right end of the graph. There are only 3-4 events for this group during the examined calendar time, though. 
+
+```{R}
+library(RColorBrewer)
+n <- 60
+qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+
+library(magrittr)
+legendtext=unique(veteran[, c("celltype", "prior")])
+legendtext=unique(paste(veteran$celltype, veteran$prior))%>%
+  sort()
+
+analyse3a=survfit(Surv(time, status)~celltype+prior, data=veteran)
+analyse3a
+plot(analyse3a, col=col_vector)
+legend("topright", legend=legendtext, col=col_vector, lty=1)
+analyse3=survdiff(Surv(time, status)~celltype+prior, data=veteran)
+print(analyse3)
+
+```
