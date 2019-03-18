@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(magrittr)
 knitr::opts_chunk$set(echo = TRUE)
 #setwd("//ad.helsinki.fi/home/s/suvivain/Documents/2019 Survival analysis")
 library(survival)
@@ -138,3 +139,23 @@ analyse3=survdiff(Surv(time, status)~celltype+prior, data=veteran)
 print(analyse3)
 
 ```
+# 4.
+
+Data matrix cervix contains grouped survival data for two cohorts of women, diagnosed with stage I or stage II cervix cancer. Use the lifetab routine in R library KMsurv to create life tables for both groups.
+```{r}
+cervix=read.table("./Week1/exercise-data/cervix.dat", sep=";", header = T)
+head(cervix); str(cervix)
+cervix1=cervix[cervix$stage==1,]
+cervix2=cervix[cervix$stage==2,]
+KMsurv::lifetab(tis=cervix1$year
+                , ninit=cervix1[cervix1$year==1,]$N
+                , nlost=cervix1$nlost
+                , nevent=cervix1$nfailure
+                )
+KMsurv::lifetab(tis=cervix2$year
+                , ninit=cervix2[cervix2$year==1,]$N
+                , nlost=cervix2$nlost
+                , nevent=cervix2$nfailure
+                )
+```
+
