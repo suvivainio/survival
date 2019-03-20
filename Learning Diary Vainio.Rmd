@@ -1,0 +1,72 @@
+---
+title: "Learning diary"
+author: "Suvi Vainio"
+date: "20 maaliskuuta 2019"
+output: html_document
+---
+
+#Characteristics and description of survival data
+##Monday 11.3.201912:15 - 14:00
+
+*Basic concepts*
+* Lexis diagram
+* Survival model (Alive --> Death at the simplest)
+* Competing risks: for example many absorbing states, such as causes of death
+* Event history model: many states and many possible transitions, for example health, deseased, dead
+* Survival analysis is modeling of positive random variables. 
+* Censoring: there are observations only up to a certain time-point after which we do not know about what happened to the subject.
+
+(jatka slaidi 14 --> )
+
+*Kaplan-Meier estimator of the survival function*
+
+
+*Log-rank test for comparing survival functions*
+
+
+*Nelson- Aalen estimate of the cumulative hazard*
+
+##Wednesday 13.3.201912:15 - 14:00
+
+##Monday 18.3.201912:15 - 14:00
+
+##Wednesday 20.3.201912:15 - 14:00
+
+##Monday 25.3.201912:15 - 14:00
+
+##Wednesday 27.3.201912:15 - 14:00
+
+### Article
+_Mok, Tony S., et al. "Improvement in overall survival in a randomized study that compared dacomitinib with gefitinib in patients with advanced non–small-cell lung cancer and EGFR-activating mutations." Journal of Clinical Oncology 36.22 (2018): 2244-2250._
+
+The paper describes a comparison between first generation lung cancer medication gefinitib and second generation medication dacomitinib. Original sample size is 452 patients that were randomly assigned dacomitinib (227) or gefitinib (225). Number of events  gefitinib. During a median follow-up time of 31.3 months, 103 (45.4%) and 117 (52.0%) deaths occurred in the dacomitinib and gefitinib arms, respectively. Cut-off was set to a certain date, at which and after which some patients were still being treated.
+
+The conclusion of the paper is that dacomitib increased the overall survivall compared to gefitinib.
+
+*Statistitical analysis and results*
+
+The final analysis overall survival was performed when at least 201 deaths were observed. Overall survival was summarized using Kaplan-Meyer methods. Cox proportional hazards model was used to were used to estimate the Hazard ratio.
+
+_OS was significantly longer with dacomitinib than with gefitinib (HR, 0.760; 95% CI, 0.582 to 0.993; two-sided P = .0438); the median OS was 34.1 months (95% CI, 29.5 to 37.7 months) with dacomitinib versus 26.8 months (95% CI, 23.7 to 32.1 months) with gefitinib._
+
+_OS at 30 months was 56.2% (95% CI, 49.0% to 62.8%) in the dacomitinib arm and was 46.3% (95% CI, 39.3% to 53.1%) in the gefitinib arm._
+
+I thought the picture with the background variables and HR rates summarized a lot of information in a visually nice way.
+
+![A nice way to visualize a lot of information.](20190327 mok et al fig 3.png)
+
+
+
+##Monday 1.4.201912:15 - 14:00
+
+##Wednesday 3.4.201912:15 - 14:00
+
+##Monday 8.4.201912:15 - 14:00
+
+##Wednesday 10.4.201912:15 - 14:00
+
+##Monday 15.4.201912:15 - 14:00
+
+##Wednesday 17.4.201912:15 - 14:00
+
+##Monday 29.4.201912:15 - 14:00
