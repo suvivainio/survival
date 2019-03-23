@@ -1,0 +1,132 @@
+---
+title: "Week 2 exercises"
+author: "Suvi Vainio"
+date: "13 maaliskuuta 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+knitr::opts_chunk$set(echo = FALSE)
+#setwd("//ad.helsinki.fi/home/s/suvivain/Documents/2019 Survival analysis")
+library(eha)
+library(survival)
+?veteran # for explanation of the variables in the data set
+data(veteran) # load the data
+str(veteran) # show records of the dat
+head(veteran)
+```
+
+# Fitting exponential and Weibull model to Veteran data
+## 1. Plot a histogram of the survival times corresponding to uncensored observations (veteran$status == 1) as done in Exercise 1.
+
+Median of survival time is 63 days and 90 % of the population has died by the dawn of day number 296.
+
+```{r}
+
+hist(veteran$time[veteran$status == 1]
+     , nclass=30, main=''
+     , xlab='Survival time (days)'
+     , col='gray90')
+
+print("Percentages of the survival")
+quantile(veteran$time[veteran$status == 1]
+         , probs=seq(0, 1, 0.1))
+```
+
+## 2. Compare the Kaplan-Meier estimate of the survival function to (a) Exponential distribution, and (b) Weibull distribution. Use graphical procedure and interpret the results.
+Hint: You can obtain the maximum likelihood estimates of the parameters using weibreg() function of eha package.
+
+Weibul distribution seems to fit the data better than exponential distribution.
+
+
+
+```{r}
+veteran0=veteran[veteran$status == 1,]
+
+analyse1=survfit(Surv(time, status)~1, data=veteran0, conf.type="none")
+
+veteran0.exp0 <- weibreg(formula = Surv(time, status) ~ 1, data=veteran0, shape=1)
+lambda0 <- exp(-veteran0.exp0$coeff[1])
+
+print(paste("Lambda-parameter for the exponential distribution is: "
+            , round(lambda0, 2), sep="")
+      )
+
+veteran0.weibull0 <- weibreg(formula = Surv(time, status) ~ 1, data=veteran0)
+b <- exp(veteran0.weibull0$coeff[1])
+a <- exp(veteran0.weibull0$coeff[2])
+
+print(paste("Parameters a and b for Weibul-distribution are: "
+            , round(a,2), " and ", round(b,2), sep=""))
+
+x1=veteran0[order(veteran0$time),]$time
+plot(analyse1)
+lines(x1, exp(-lambda0*x1), col="blue", type="l")
+lines(x1, exp(-(x1/b)**a), col="red")
+legend("topright"
+       , legend = c("data", "exponential", "weibul")
+       , col=c("black", "blue", "red"), lty=1)
+print("Result for the fitted exponential model")
+veteran0.exp0
+print("Result for the Weibul model")
+veteran0.weibull0
+```
+
+# Model choice
+
+## 3. Compare the above two models with the likelihood ratio test. Interpret the result. Hint: You can extract the log-likelihood values from the output objects of function weibreg. Use the pchisq function to calculate the p-value (tail probability).
+
+Alternative: You can calculate the likelihood ratio by using the anova command on the output objects from the two regression models using survreg.
+
+Hypotheses for likelihood-ratio test are:
+
+H0: Simple exponential and Weibull model fit the data equally good.
+H1: Weibull distribution fits the data better.
+
+Test statistic is -2log(theta0-theta1).
+
+```{r}
+
+print(paste0("Loglikelihood for exponential model: ", veteran0.exp0$loglik[1]))
+print(paste0("Loglikelihood for Weibul-model is: ", veteran0.weibull0$loglik[1]))
+print(paste0("Test statistic value is: "
+             , -2*(chi2.veteran0.exp0-chi2.veteran0.weibul0)[1]
+             , " with 1 degree of freedom."
+             )
+      )
+print(paste0("and probability for test statistic to be larger than observed is: "
+             , pchisq(-2*(chi2.veteran0.exp0-chi2.veteran0.weibul0)[1]
+                      , df=1
+                      , lower.tail = F)
+             , " thus more complex Weibull-model fits the data better than exponential model."
+             )
+      )
+
+```
+
+# Simulation
+1. Generate 100 random numbers from exponential distribution with mean 0.01 and store it in T.
+R's function uses rate as a parameter, mean equals 1/rate.
+1. Plot the empirical distribution function.
+2. Estimate the rate (stored under obsrate) from the simulated data and overlay the plot of the distribution function 1 − exp(−obsrate  t).
+3. Overlay the plot of the true exponential distribution function.
+4. Explore the possibilities for different kinds of line and point plots. Vary the plot symbol, line type, line width, and colour. Also, try to give legend in the above graph.
+
+```{r, echo=T}
+set.seed(60)
+sample0=rexp(100, 1/0.01)
+lambdaHat=100/sum(sample0)
+print(paste0("Estimated lambda is: ", lambdaHat))
+hist(sample0, freq = F, ylim=c(0, 120))
+lines(sample0[order(sample0)], 1-lambdaHat*exp(-lambdaHat*sample0[order(sample0)]), col="blue")
+lines(sample0[order(sample0)], lambdaHat*exp(-lambdaHat*sample0[order(sample0)]), col="red")
+legend("topright", c("Sampled data", "Survival function with lambdaHat", "Probability funtion with lambdaHat")
+       , col=c("black", "blue", "red"), lty=1)
+
+```
+
+
+
+
+
